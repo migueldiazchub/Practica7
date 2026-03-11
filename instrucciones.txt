@@ -1,0 +1,122 @@
+Práctica 7 - Pokémon backend
+Vamos a hacer una api en express para simular batallas Pokémon. Para ello nuestro
+backend dispondrá de un fichero JSON con una lista de objetos como este:
+{
+"nombre": "Pikachu",
+"tipo": "electrico",
+"vida": 100,
+"defensa": 65,
+"ataques": [
+{
+"nombre": "Impactrueno",
+"potencia": 40
+},
+{
+"nombre": "Chispazo",
+"potencia": 20
+},
+{
+"nombre": "Voltio Cruel",
+"potencia": 60
+}]}
+
+Tendremos un objeto declarado como constante en nuestro backend (lo podremos añadir a
+req como req.combates en un middleware)
+const combates = [];
+Aquí guardaremos una lista de los combates simultáneos que están teniendo lugar para
+poder mantenerlos organizados. Es importante que cada combate tenga un identificador
+único. Los combates serán objetos con el siguiente formato:
+{
+"id": 1,
+"pokemon1": {
+"nombre": "Pikachu",
+"vida": 100
+},
+"pokemon2": {
+"nombre": "Charmander",
+"vida": 100
+},
+"turno": 1,
+"ganador": null
+}
+
+
+Endpoints:
+● GET /pokemon/lista
+● POST /pokemon/nuevo
+● GET /combate/lista
+● GET /combate/estado
+● POST /combate/nuevo
+● POST /combate/ataque
+● POST /combate/borrar
+
+GET /pokemon/lista
+Este GET devolverá una lista con los nombres de los pokémon que tenemos en el JSON
+Respuesta:
+{ "pokemons": ["Pikachu", "Charmander", "Bulbasaur", "Squirtle"]}
+
+POST /pokemon/nuevo
+Recibirá por POST un nuevo objeto pokémon, verificará que están todos los valores y lo
+añadirá al JSON.
+Respuestas:
+● 200: { "status": "ok" }
+● 400: "faltan datos necesarios"
+
+GET /combate/lista
+Devolverá una lista con los combates que están teniendo lugar.
+Respuesta:
+{ combates: [{
+"id": 1,
+"pokemon1": {
+"nombre": "Pikachu",
+"vida": 76.1
+},
+"pokemon2": {
+"nombre": "Charmander",
+"vida": 67.667
+},
+"turno": 2,
+"ganador": null
+}]}
+
+GET /combate/estado
+Recibirá como parámetro el id del combate y devolverá el estado del combate. Es decir, si
+aún está en curso, de quién es el turno y cuánta vida tiene cada pokémon.
+Respuestas:
+● 200:
+{ "combate": {
+"id": 1,
+"pokemon1": {
+"nombre": "Pikachu",
+"vida": 76.1
+},
+"pokemon2": {
+"nombre": "Charmander",
+"vida": 67.667
+},
+"turno": 2,
+"ganador": null
+}}
+● 400: "Combate no encontrado"
+
+POST /combate/nuevo
+Recibirá por POST los nombres de los 2 pokémon, creará un nuevo combate y devolverá el
+identificador único del combate.
+Respuestas:
+● 200: { "combate": 1 } <= identificador del combate
+● 400: "Uno de los pokémon no existe"
+
+POST /combate/ataque
+Recibirá por POST el identificador del combate y el nombre del ataque que se realice. Se
+comprobará que el Pokémon tiene el ataque en cuestión y realizará el golpe. Cambiará el
+turno y devolverá el daño causado
+Respuestas:
+● 200: { "golpe": 21.234 }
+● 400: "El combate no existe"
+● 400: "El ataque no existe"
+
+POST /combate/borrar
+Recibirá el identificador del combate y lo borrará de la lista
+Respuestas:
+● 200: { "status": "ok" }
+● 400: "El combate no existe"

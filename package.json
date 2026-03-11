@@ -1,0 +1,21 @@
+{
+  "name": "practica7",
+  "version": "1.0.0",
+  "description": "practica7 programacion combates pokemon",
+  "keywords": [
+    "practica",
+    "pokemon",
+    "programacion"
+  ],
+  "license": "ISC",
+  "author": "Miguel",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14"
+  }
+}
