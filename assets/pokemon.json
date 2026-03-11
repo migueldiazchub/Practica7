@@ -1,0 +1,78 @@
+[
+    {
+        "nombre": "Pikachu",
+        "tipo": "electrico",
+        "vida": 100,
+        "defensa": 65,
+        "ataques": 
+            [
+                {
+                "nombre": "Impactrueno",
+                "potencia": 40
+                },
+                {
+                "nombre": "Chispazo",
+                "potencia": 20
+                },
+                {
+                "nombre": "Voltio Cruel",
+                "potencia": 60
+                }
+            ]
+    },
+    {
+        "nombre": "Charmander",
+        "tipo": "fuego",
+        "vida": 90,
+        "defensa": 60,
+        "ataques": 
+            [
+                {
+                "nombre": "Ascuas",
+                "potencia": 40
+                },
+                {
+                "nombre": "Lanzallamas",
+                "potencia": 80
+                }
+            ]
+    },
+    {
+        "nombre": "Squirtle",
+        "tipo": "agua",
+        "vida": 100,
+        "defensa": 65,
+        "ataques": 
+            [
+                {
+                "nombre": "Pistola agua",
+                "potencia": 40
+                },
+                {
+                "nombre": "Burbuja",
+                "potencia": 20
+                },
+                {
+                "nombre": "Surf",
+                "potencia": 60
+                }
+            ]
+    },
+    {
+        "nombre": "Bulbasaur",
+        "tipo": "planta",
+        "vida": 120,
+        "defensa": 90,
+        "ataques": 
+            [
+                {
+                "nombre": "Látigo cepa",
+                "potencia": 40
+                },
+                {
+                "nombre": "Drenadoras",
+                "potencia": 20
+                }
+            ]
+    }
+]
