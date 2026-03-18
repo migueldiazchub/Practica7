@@ -8,3 +8,9 @@ app.use("/pokemon", pokemonRuta);
 
 const combateRuta = require("./routes/combate");
 app.use("/combate", combateRuta);
+
+app.listen(
+  app.listen(3000, () => {
+    console.log("http://localhost:3000");
+  }),
+);
