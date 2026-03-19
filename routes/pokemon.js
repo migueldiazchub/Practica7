@@ -18,22 +18,31 @@ router.get("/lista", (req, res) => {
   res.json(lista);
 });
 
-function comprobarBodyNuevo(nuevo) {
-  let mismasClaves = true;
-  const referencia = listaPokemon[0];
-  let numeroPropiedadReferencia = 0;
+/**
+ * Recibe el json enviado por el req.body de la petición y comprueba si tiene exactamente las
+ * mismas claves que uno de los objetos de la lista de pokemon.json
+ * @param {JSON} nuevoPokemon 
+ * @returns {Boolean}
+ */
 
-  for (let propiedad in referencia) {
-  }
+function compararClavesBody(nuevoPokemon) {
+  const clavesReferencia = Object.keys(listaPokemon[0]).sort();
+  const clavesNuevo = Object.keys(nuevoPokemon).sort();
+  
+  return (JSON.stringify(clavesReferencia) === JSON.stringify(clavesNuevo));
 }
-
-comprobarBodyNuevo();
 
 router.post("/nuevo", (req, res) => {
   const nuevoPokemon = { ...req.body };
-  listaPokemon.push(nuevoPokemon);
-  res.status(200);
-  res.json({ status: "ok" });
+
+  if (compararClavesBody(nuevoPokemon)) {
+    listaPokemon.push(nuevoPokemon);
+    res.status(200);
+    res.json({ status: "ok" });
+  } else {
+    res.status(400);
+    res.json({ status: "error", motivo: "los datos introducidos no son correctos"})
+  }
 });
 
 module.exports = router;
