@@ -21,15 +21,17 @@ router.get("/lista", (req, res) => {
 /**
  * Recibe el json enviado por el req.body de la petición y comprueba si tiene exactamente las
  * mismas claves que uno de los objetos de la lista de pokemon.json
- * @param {JSON} nuevoPokemon 
+ * @param {JSON} nuevoPokemon
  * @returns {Boolean}
  */
 
 function compararClavesBody(nuevoPokemon) {
+  //Object.keys() devuelve las claves del objeto introducido, .sort() está
+  //para que el orden de las claves sea irrelevante
   const clavesReferencia = Object.keys(listaPokemon[0]).sort();
   const clavesNuevo = Object.keys(nuevoPokemon).sort();
-  
-  return (JSON.stringify(clavesReferencia) === JSON.stringify(clavesNuevo));
+
+  return JSON.stringify(clavesReferencia) === JSON.stringify(clavesNuevo);
 }
 
 router.post("/nuevo", (req, res) => {
@@ -41,7 +43,10 @@ router.post("/nuevo", (req, res) => {
     res.json({ status: "ok" });
   } else {
     res.status(400);
-    res.json({ status: "error", motivo: "los datos introducidos no son correctos"})
+    res.json({
+      status: "error",
+      motivo: "los datos introducidos no son correctos",
+    });
   }
 });
 
