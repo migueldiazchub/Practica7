@@ -1,7 +1,7 @@
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
+const router = Router();
 
-const listaPokemon = require("../assets/pokemon.json");
+import listaPokemon from "../assets/pokemon.json" with { type: "json" };
 
 //metodo extra para ver el json completo
 router.get("/", (req, res) => {
@@ -50,4 +50,4 @@ router.post("/nuevo", (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

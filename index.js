@@ -1,12 +1,12 @@
-const express = require("express");
+import express, { json, urlencoded } from "express";
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(json());
+app.use(urlencoded({ extended: true }));
 
-const pokemonRuta = require("./routes/pokemon");
+import pokemonRuta from "./routes/pokemon.js";
 app.use("/pokemon", pokemonRuta);
 
-const combateRuta = require("./routes/combate");
+import combateRuta from "./routes/combate.js";
 app.use("/combate", combateRuta);
 
 app.listen(

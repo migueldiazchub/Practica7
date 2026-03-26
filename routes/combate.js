@@ -1,5 +1,5 @@
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
+const router = Router();
 
 // Tendremos un objeto declarado como constante en nuestro backend (lo podremos añadir a
 // req como req.combates en un middleware)
@@ -67,4 +67,4 @@ router.get("/estado/:id", (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
