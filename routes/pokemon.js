@@ -51,3 +51,4 @@ router.post("/nuevo", (req, res) => {
 });
 
 export default router;
+export { listaPokemon };
