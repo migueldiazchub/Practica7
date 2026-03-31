@@ -220,6 +220,23 @@ router.post("/ataque/:id", (req, res) => {
   }
 });
 
-router.delete
+//en la práctica pone post, pero delete parecía más apropiado
+//no terminado, el endpoint /ejemplo hace cosas raras
+router.delete("/borrar/:id", (req, res) => {
+  const combate = getCombate(req.params.id);
+  if(!combate){
+    res.status(400);
+    res.json({
+      status: "error",
+      motivo: "combate no encontrado",
+    });
+
+  } else {
+    combates.splice((req.params.id - 1), 1);
+
+    res.status(200);
+    res.json({ "status": "ok"});
+  }
+})
 
 export default router;
