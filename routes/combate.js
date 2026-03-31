@@ -16,7 +16,7 @@ const combates = [];
 router.use("/ejemplo", (req, res, next) => {
   combates.push(
     {
-      id: 1,
+      id: asignarId(),
       pokemon1: {
         nombre: "Pikachu",
         vida: 100,
@@ -27,9 +27,10 @@ router.use("/ejemplo", (req, res, next) => {
       },
       turno: 1,
       ganador: null,
-    },
+    });
+  combates.push(
     {
-      id: 2,
+      id: asignarId(),
       pokemon1: {
         nombre: "Bulbasaur",
         vida: 120,
@@ -40,8 +41,7 @@ router.use("/ejemplo", (req, res, next) => {
       },
       turno: 1,
       ganador: null,
-    },
-  );
+    });
   res.status(200);
   res.json({ status: "ok" });
   next();
@@ -51,21 +51,30 @@ router.get("/lista", (req, res) => {
   res.json({ combates: combates });
 });
 
-router.get("/estado/:id", (req, res) => {
+//función para comprobar si existe un combate, que devuelve false si no existe
+//y devuelve los datos del combate si existe
+function getCombate(id){
   let existe = false;
   for (let combate of combates) {
-    if (combate.id == req.params.id) {
+    if (combate.id == id) {
       existe = true;
-      res.status(200);
-      res.json({ combate: combate });
+      return combate;
     }
   }
-  if (!existe) {
+  return existe;
+}
+
+router.get("/estado/:id", (req, res) => {
+  const combate = getCombate(req.params.id);
+  if(!combate){
     res.status(400);
     res.json({
       status: "error",
       motivo: "combate no encontrado",
     });
+  } else {
+    res.status(200);
+    res.json({ combate: combate});
   }
 });
 
@@ -97,43 +106,58 @@ function asignarId() {
   }
 }
 
-//función que recibe un nombre de pokemon como parámetro y comprueba si existe en la lista
-function comprobarPokemon(pokemon) {
-  let existe = false;
+//función que recibe el nombre de un pokemon
+//si existe devuelve un objeto con sus datos, si no devuelve un booleano false
+function getDatosPokemon(nombrePokemon) {
   for (let pokemon of listaPokemon) {
-    if (pokemon.nombre.toLowerCase() == pokemon.toLowerCase()) {
-      existe = true;
-      break;
+    if (pokemon.nombre.toLowerCase() == nombrePokemon.toLowerCase()) {
+      const datos = JSON.parse(JSON.stringify(pokemon));
+      return datos;
     }
   }
-  return existe;
+  //si ha recorrido toda la lista sin encontrar coincidencias, devuelve false
+  return false;
 }
-
-function getDatosPokemon(pokemon) {}
 
 router.post("/nuevo", (req, res) => {
   const { pokemon1, pokemon2 } = req.body;
-  if (!comprobarPokemon(pokemon1) || !comprobarPokemon(pokemon2)) {
+  let datosPokemon1 = getDatosPokemon(pokemon1);
+  let datosPokemon2 = getDatosPokemon(pokemon2);
+
+  //la función getDatosPokemon() devuelve false si el parámetro de nombre no coincide con 
+  //ningún pokemon existente para poder hacer esta comprobación
+  if (!datosPokemon1 || !datosPokemon2) {
     res.status(400);
     res.json({
       status: "error",
       motivo: "Uno de los pokemon no existe",
     });
-  }
 
-  const nuevoCombate = {
-    id: asignarId(),
-    pokemon1: {
-      nombre: "Pikachu",
-      vida: 100,
-    },
-    pokemon2: {
-      nombre: "Charmander",
-      vida: 90,
-    },
-    turno: 1,
-    ganador: null,
-  };
+  } else {
+    const nuevoCombate = {
+      id: asignarId(),
+      pokemon1: {
+        nombre: datosPokemon1.nombre,
+        vida: datosPokemon1.vida,
+      },
+      pokemon2: {
+        nombre: datosPokemon2.nombre,
+        vida: datosPokemon2.vida,
+      },
+      turno: 1,
+      ganador: null,
+    };
+    combates.splice((nuevoCombate.id - 1), 0, nuevoCombate);
+    res.status(200);
+    res.json({
+      "status": "ok",
+      "combate": nuevoCombate.id
+    });
+  }
+});
+
+router.post("/ataque/:id", (req, res) => {
+
 });
 
 export default router;
