@@ -156,8 +156,70 @@ router.post("/nuevo", (req, res) => {
   }
 });
 
+/*
+esquema
+1. getCombate() comprobar si combate existe, devuelve 400 si no
+2. getDatosPokemon() para acceder al atributo ataques, posiblemente cogiendo solo el del turno actual
+3. for of con {"ataque": "..."} declarado para comprobar si existe, 400 si no
+4. formula ataque, resta vida, posiblemente reusando practica4, posiblemente fetch para efectividad
+5. cambia turno 1 a 2 y viceversa
+6. si todo funcionó, devuelve 200
+ */
 router.post("/ataque/:id", (req, res) => {
+  const {ataque} = req.body;
+  const combate = getCombate(req.params.id);
 
+  if (!combate) {
+    res.status(400);
+    res.json({
+      status: "error",
+      motivo: "combate no encontrado",
+    });
+
+  } else {
+    let ataques = [];
+    if(combate.turno == 1) {
+      ataques = getDatosPokemon(combate.pokemon1.nombre).ataques;
+    } else {
+      ataques = getDatosPokemon(combate.pokemon2.nombre).ataques;
+    }
+
+    let ataqueExiste = false;
+    for(let ataquePokemon of ataques){
+      if(ataquePokemon.nombre == ataque){
+        ataqueExiste = true;
+        break;
+      }
+    }
+
+    if(!ataqueExiste){
+      res.status(400);
+      res.json({
+        status: "error",
+        motivo: "ataque no encontrado",
+      });
+
+    } else {
+
+      //formula para un golpe, practica4
+
+      //probablemente habrá un problema futuro, indexOf dejará de funcionar por que se están produciendo cambios
+      //una posible solución es duplicar los cambios para que estén tanto en la variable local como en la global
+      if(combate.turno == 1){
+        (combates.indexOf(combate)).turno = 2;
+      } else {
+        (combates.indexOf(combate)).turno = 1;
+      }
+
+      res.status(200);
+      res.json({
+        "status": "ok",
+        "golpe": numero //daño causado por el golpe
+      });
+    }
+  }
 });
+
+router.delete
 
 export default router;
