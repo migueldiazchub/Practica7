@@ -3,13 +3,6 @@ const router = Router();
 
 import { listaPokemon } from "./pokemon.js";
 
-// Tendremos un objeto declarado como constante en nuestro backend (lo podremos añadir a
-// req como req.combates en un middleware)
-// const combates = [];
-// Aquí guardaremos una lista de los combates simultáneos que están teniendo lugar para
-// poder mantenerlos organizados. Es importante que cada combate tenga un identificador
-// único.
-
 const combates = [];
 
 //método para introducir valores de combate de ejemplo en la lista
@@ -51,8 +44,12 @@ router.get("/lista", (req, res) => {
   res.json({ combates: combates });
 });
 
-//función para comprobar si existe un combate, que devuelve false si no existe
-//y devuelve los datos del combate si existe
+/**
+ * Recibe el int de id de un combate y devuelve dicho combate si existe o un booleano false si no existe
+ * @param {number} id 
+ * @returns {(Object|boolean)}
+ */
+
 function getCombate(id){
   let existe = false;
   for (let combate of combates) {
@@ -78,7 +75,13 @@ router.get("/estado/:id", (req, res) => {
   }
 });
 
-//función que devuelve el número más bajo que no esté cogido de entre las ids de la lista de combates
+/**
+ * Crea un int que va incrementando tras recorrer la lista de combates.
+ * Devuelve el número más bajo que no esté siendo utilizado actualmente 
+ * como id para un combate
+ * @returns {number} 
+ */
+
 function asignarId() {
   let id = 1;
   //booleano declarado como false para que el bucle pueda empezar
@@ -106,8 +109,13 @@ function asignarId() {
   }
 }
 
-//función que recibe el nombre de un pokemon
-//si existe devuelve un objeto con sus datos, si no devuelve un booleano false
+/**
+ * Recibe un string con el nombre de un pokemon y comprueba si existe un pokemon con ese nombre.
+ * Si existe devuelve el objeto para ese pokemon y si no existe devuelve un booleano false
+ * @param {string} nombrePokemon 
+ * @returns {(Object|boolean)}
+ */
+
 function getDatosPokemon(nombrePokemon) {
   for (let pokemon of listaPokemon) {
     if (pokemon.nombre.toLowerCase() == nombrePokemon.toLowerCase()) {
@@ -115,7 +123,6 @@ function getDatosPokemon(nombrePokemon) {
       return datos;
     }
   }
-  //si ha recorrido toda la lista sin encontrar coincidencias, devuelve false
   return false;
 }
 

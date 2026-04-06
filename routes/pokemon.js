@@ -11,7 +11,7 @@ router.get("/", (req, res) => {
 router.get("/lista", (req, res) => {
   const lista = {
     pokemon: [],
-  };
+  }
   for (let pokemon of listaPokemon) {
     lista["pokemon"].push(pokemon.nombre);
   }
