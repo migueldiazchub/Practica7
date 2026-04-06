@@ -1,6 +1,12 @@
 import { Router } from "express";
 const router = Router();
 
+//este archivo contiene funciones de la Práctica 4 usadas para conseguir
+//las relaciones entre los tipos gracias a la pokeapi
+import { golpe } from "../assets/efectividad.js";
+
+//se tiene que importar la lista de la ruta de pokemon.js porque se actualiza
+//otra posibilidad sería tener métodos que reescriben sobre el json de los pokemon
 import { listaPokemon } from "./pokemon.js";
 
 const combates = [];
@@ -63,6 +69,8 @@ function getCombate(id){
 
 router.get("/estado/:id", (req, res) => {
   const combate = getCombate(req.params.id);
+  
+  //este tipo de comprobación es el motivo por el que la función getCombate() puede devolver un false
   if(!combate){
     res.status(400);
     res.json({
@@ -119,8 +127,7 @@ function asignarId() {
 function getDatosPokemon(nombrePokemon) {
   for (let pokemon of listaPokemon) {
     if (pokemon.nombre.toLowerCase() == nombrePokemon.toLowerCase()) {
-      const datos = JSON.parse(JSON.stringify(pokemon));
-      return datos;
+      return pokemon;
     }
   }
   return false;
@@ -131,13 +138,11 @@ router.post("/nuevo", (req, res) => {
   let datosPokemon1 = getDatosPokemon(pokemon1);
   let datosPokemon2 = getDatosPokemon(pokemon2);
 
-  //la función getDatosPokemon() devuelve false si el parámetro de nombre no coincide con 
-  //ningún pokemon existente para poder hacer esta comprobación
   if (!datosPokemon1 || !datosPokemon2) {
     res.status(400);
     res.json({
       status: "error",
-      motivo: "Uno de los pokemon no existe",
+      motivo: "uno de los pokemon no existe",
     });
 
   } else {
@@ -163,18 +168,12 @@ router.post("/nuevo", (req, res) => {
   }
 });
 
-/*
-esquema
-1. getCombate() comprobar si combate existe, devuelve 400 si no
-2. getDatosPokemon() para acceder al atributo ataques, posiblemente cogiendo solo el del turno actual
-3. for of con {"ataque": "..."} declarado para comprobar si existe, 400 si no
-4. formula ataque, resta vida, posiblemente reusando practica4, posiblemente fetch para efectividad
-5. cambia turno 1 a 2 y viceversa
-6. si todo funcionó, devuelve 200
- */
-router.post("/ataque/:id", (req, res) => {
+router.post("/ataque/:id", async (req, res) => {
   const {ataque} = req.body;
   const combate = getCombate(req.params.id);
+
+  //declarado el índice del combate para poder actualizarlo con splice más adelante
+  const indiceCombate = combates.indexOf(combate);
 
   if (!combate) {
     res.status(400);
@@ -183,18 +182,29 @@ router.post("/ataque/:id", (req, res) => {
       motivo: "combate no encontrado",
     });
 
+  } else if(combate.turno == null){
+    res.status(400);
+    res.json({
+      status: "error",
+      motivo: "el combate ha terminado",
+    });
+
   } else {
-    let ataques = [];
+    let atacante; let defensor;
     if(combate.turno == 1) {
-      ataques = getDatosPokemon(combate.pokemon1.nombre).ataques;
+      atacante = getDatosPokemon(combate.pokemon1.nombre);
+      defensor = getDatosPokemon(combate.pokemon2.nombre);
     } else {
-      ataques = getDatosPokemon(combate.pokemon2.nombre).ataques;
+      atacante = getDatosPokemon(combate.pokemon2.nombre);
+      defensor = getDatosPokemon(combate.pokemon1.nombre);
     }
 
     let ataqueExiste = false;
-    for(let ataquePokemon of ataques){
-      if(ataquePokemon.nombre == ataque){
+    let potenciaAtaque = 0;
+    for(let ataquePokemon of atacante.ataques){
+      if(ataquePokemon.nombre.toLowerCase() == ataque.toLowerCase()){
         ataqueExiste = true;
+        potenciaAtaque = ataquePokemon.potencia;
         break;
       }
     }
@@ -207,21 +217,39 @@ router.post("/ataque/:id", (req, res) => {
       });
 
     } else {
+      let damage = await golpe(atacante, defensor, potenciaAtaque);
 
-      //formula para un golpe, practica4
-
-      //probablemente habrá un problema futuro, indexOf dejará de funcionar por que se están produciendo cambios
-      //una posible solución es duplicar los cambios para que estén tanto en la variable local como en la global
+      //cambia el turno para siguientes ataques y resta la vida al pokemon defensor
       if(combate.turno == 1){
-        (combates.indexOf(combate)).turno = 2;
+        combate.turno = 2;
+        combate.pokemon2.vida -= damage;
+        if(combate.pokemon2.vida <= 0){
+          //si la vida baja a 0 o menos, la pone en 0 como mínimo
+          combate.pokemon2.vida = 0;
+
+          //también declara al atacante como ganador y pone el turno en null porque
+          //no habrá una siguiente ronda
+          combate.ganador = combate.pokemon1.nombre;
+          combate.turno = null;
+        }
       } else {
-        (combates.indexOf(combate)).turno = 1;
+        combate.turno = 1;
+        combate.pokemon1.vida -= damage;
+        if(combate.pokemon1.vida <= 0){
+          combate.pokemon1.vida = 0;
+
+          combate.ganador = combate.pokemon2.nombre;
+          combate.turno = null;
+        }
       }
+
+      //actualiza el objeto en la lista de combates
+      combates.splice(indiceCombate, 1, combate);
 
       res.status(200);
       res.json({
         "status": "ok",
-        "golpe": numero //daño causado por el golpe
+        "golpe": damage
       });
     }
   }
