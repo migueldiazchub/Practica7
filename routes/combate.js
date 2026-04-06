@@ -256,9 +256,10 @@ router.post("/ataque/:id", async (req, res) => {
 });
 
 //en la práctica pone post, pero delete parecía más apropiado
-//no terminado, el endpoint /ejemplo hace cosas raras
 router.delete("/borrar/:id", (req, res) => {
   const combate = getCombate(req.params.id);
+  const indiceCombate = combates.indexOf(combate);
+
   if(!combate){
     res.status(400);
     res.json({
@@ -267,7 +268,7 @@ router.delete("/borrar/:id", (req, res) => {
     });
 
   } else {
-    combates.splice((req.params.id - 1), 1);
+    combates.splice(indiceCombate, 1);
 
     res.status(200);
     res.json({ "status": "ok"});
